@@ -7,13 +7,29 @@ export default function MedicalDecoder() {
   const [decodedMatches, setDecodedMatches] = useState([]);
   
   useEffect(() => {
-    // Run decoder automatically as they type
-    if (inputText.trim().length > 2) {
-      const matches = decodeText(inputText);
-      setDecodedMatches(matches);
-    } else {
-      setDecodedMatches([]);
-    }
+    const fetchDecodedMatches = async () => {
+      if (inputText.trim().length > 2) {
+        try {
+          const host = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+          const response = await fetch(`${host}/api/decode`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: inputText }),
+          });
+          if (!response.ok) throw new Error('API server returned error');
+          const data = await response.json();
+          setDecodedMatches(data.matches || []);
+        } catch (error) {
+          console.warn('[MedicalDecoder] Node.js API offline. Falling back to local client decoder.', error);
+          const matches = decodeText(inputText);
+          setDecodedMatches(matches);
+        }
+      } else {
+        setDecodedMatches([]);
+      }
+    };
+
+    fetchDecodedMatches();
   }, [inputText]);
 
   const handleSampleText = () => {

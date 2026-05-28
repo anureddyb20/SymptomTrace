@@ -49,7 +49,24 @@ export default function DiagnosticPreview({ activeTab }) {
     }, 800);
   };
 
-  const calculateDiagnoses = (entry) => {
+  const calculateDiagnoses = async (entry) => {
+    try {
+      const host = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+      const response = await fetch(`${host}/api/diagnose`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+      if (!response.ok) throw new Error('API server returned error');
+      const data = await response.json();
+      setResults(data.results || []);
+    } catch (error) {
+      console.warn('[DiagnosticPreview] Node.js API offline. Falling back to local diagnostic compiler.', error);
+      runLocalCalculation(entry);
+    }
+  };
+
+  const runLocalCalculation = (entry) => {
     const list = entry.selectedSymptoms || [];
     const pain = entry.details?.pain || null;
     const fatigue = entry.details?.fatigue || null;
