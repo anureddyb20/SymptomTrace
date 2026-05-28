@@ -9,7 +9,7 @@ export default function DiagnosticPreview({ activeTab }) {
   const [latestEntry, setLatestEntry] = useState(null);
 
   useEffect(() => {
-    if (activeTab === 2) { // 0-indexed: Privacy (0), Smart Check (1), Diagnostic (2)
+    if (activeTab === 3) { // 0-indexed: Dashboard (0), Privacy (1), Smart Check (2), Diagnostic (3)
       runEvaluation();
     }
   }, [activeTab]);
