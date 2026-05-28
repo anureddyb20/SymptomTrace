@@ -60,10 +60,10 @@ export default function MedicalDecoder() {
       <div className="decoder-dashboard-layout">
         {/* Left Panel: Input Area */}
         <div className="card input-card">
-          <div className="card-header-with-icon justify-between">
-            <div className="flex-center-gap">
+          <div className="flex justify-between align-items-center mb-4">
+            <div className="flex align-items-center" style={{ gap: '14px' }}>
               <FileText className="text-primary" size={24} />
-              <h2>Clinical Document Workspace</h2>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--primary-dark)' }}>Clinical Document Workspace</h2>
             </div>
             <div className="flex-gap-2">
               <button onClick={handleSampleText} className="btn btn-outline btn-xs">Load Sample Note</button>

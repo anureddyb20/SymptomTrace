@@ -180,10 +180,10 @@ export default function PrivacyCenter({ onDataChanged }) {
 
         {/* JSON Inspector Card */}
         <div className="card db-inspector-card col-span-2">
-          <div className="card-header-with-icon justify-between">
-            <div className="flex-center-gap">
+          <div className="flex justify-between align-items-center mb-4">
+            <div className="flex align-items-center" style={{ gap: '14px' }}>
               <FileCode className="text-primary" size={24} />
-              <h2>Browser Database Inspector</h2>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--primary-dark)' }}>Browser Database Inspector</h2>
             </div>
             <button onClick={handleCopyRaw} className="btn btn-outline btn-xs">
               {copiedText ? 'Copied!' : 'Copy Raw Database'}

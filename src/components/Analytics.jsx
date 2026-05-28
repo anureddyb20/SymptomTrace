@@ -247,10 +247,10 @@ export default function Analytics({ activeTab }) {
       <div className="analytics-dashboard-grid">
         {/* Core Trend Graph */}
         <div className="card chart-card col-span-2">
-          <div className="card-header-with-icon justify-between">
-            <div className="flex-center-gap">
+          <div className="flex justify-between align-items-center mb-4">
+            <div className="flex align-items-center" style={{ gap: '14px' }}>
               <TrendingUp className="text-primary" size={24} />
-              <h2>Symptom Severity & Cycle Timeline Correlation</h2>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--primary-dark)' }}>Symptom Severity & Cycle Timeline Correlation</h2>
             </div>
             <span className="text-xs text-muted">Timeframe: {timeWindow} Days</span>
           </div>
