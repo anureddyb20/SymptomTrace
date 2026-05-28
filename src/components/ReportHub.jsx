@@ -32,6 +32,102 @@ export default function ReportHub() {
     return mapped;
   };
 
+  const renderDetailedCharacteristics = (entry) => {
+    if (!entry || !entry.details) return null;
+    const details = entry.details;
+    const items = [];
+
+    if (details.pain) {
+      const activeQuads = Object.keys(details.pain.quadrants).filter(q => details.pain.quadrants[q]).map(q => q.toUpperCase()).join(', ') || 'None selected';
+      items.push({
+        label: 'Pain Profile',
+        value: `Intensity: ${details.pain.intensity}/10 | Location(s): ${activeQuads} | Frequency: ${details.pain.frequency}`
+      });
+    }
+    if (details.fatigue) {
+      items.push({
+        label: 'Fatigue Profile',
+        value: `Type: ${details.fatigue.type} | Sleep Resolution: ${details.fatigue.sleepRest === 'unrelieved' ? 'Unrefreshing sleep' : 'Relieved by rest'}`
+      });
+    }
+    if (details.palpitations) {
+      const triggers = Object.keys(details.palpitations.triggers).filter(t => details.palpitations.triggers[t]).join(', ') || 'None logged';
+      items.push({
+        label: 'Palpitation Triggers',
+        value: triggers
+      });
+    }
+    if (details.bleeding) {
+      items.push({
+        label: 'Bleeding Profile',
+        value: `Regularity: ${details.bleeding.regularity} | Volume: ${details.bleeding.volume} | Clots: ${details.bleeding.clotSize}`
+      });
+    }
+    if (details.digestive) {
+      const gi = [];
+      if (details.digestive.painBowel) gi.push('Pain during bowel movements');
+      if (details.digestive.cycleLinkedIbs) gi.push('Cycle-linked IBS');
+      if (details.digestive.nausea) gi.push('Nausea/Reflux');
+      items.push({
+        label: 'Gastrointestinal',
+        value: gi.join(', ') || 'None reported'
+      });
+    }
+    if (details.dizziness) {
+      const orth = [];
+      if (details.dizziness.standingUp) orth.push('Lightheadedness on standing');
+      if (details.dizziness.heatIntolerance) orth.push('Heat/Shower triggered');
+      if (details.dizziness.fainting) orth.push('History of fainting/syncope');
+      items.push({
+        label: 'Orthostatic Dizziness',
+        value: orth.join(', ') || 'None reported'
+      });
+    }
+    if (details.temperature) {
+      const temp = [];
+      if (details.temperature.coldIntolerance) temp.push('Cold intolerance');
+      if (details.temperature.heatIntolerance) temp.push('Heat intolerance');
+      if (details.temperature.hairThinning) temp.push('Hair/Eyebrow thinning');
+      items.push({
+        label: 'Thyroid & Temperature',
+        value: temp.join(', ') || 'None reported'
+      });
+    }
+    if (details.mood) {
+      const md = [];
+      if (details.mood.pmddSigns) md.push('PMDD (premenstrual dysphoric) flares');
+      if (details.mood.insomnia) md.push('Cycle-linked insomnia');
+      items.push({
+        label: 'Neuro-Hormonal & Sleep',
+        value: md.join(', ') || 'None reported'
+      });
+    }
+
+    if (items.length === 0) return null;
+
+    return (
+      <div className="report-section mt-3">
+        <h3 className="report-sec-title"><ClipboardList size={16} className="inline mr-1" /> PATIENT-SPECIFIC SYMPTOM CHARACTERISTICS</h3>
+        <table className="report-table">
+          <thead>
+            <tr>
+              <th style={{ width: '30%' }}>Symptom Group</th>
+              <th>Detailed Characteristics & Clinical Markers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item, idx) => (
+              <tr key={idx}>
+                <td><strong>{item.label}</strong></td>
+                <td>{item.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -124,7 +220,11 @@ export default function ReportHub() {
                             irregularBleeding: 'Irregular Bleeding',
                             jointPain: 'Joint/Muscle Pain',
                             bloating: 'Bloating',
-                            brainFog: 'Cognitive Dysfunction'
+                            brainFog: 'Cognitive Dysfunction',
+                            digestiveIssues: 'Gastrointestinal & Bowel Issues',
+                            dizziness: 'Orthostatic Dizziness / Fainting',
+                            coldSensitivity: 'Thyroid & Temperature Markers',
+                            moodFluctuations: 'Cycle-Linked Mood Shifts'
                           };
                           return nameMap[s] || s;
                         }).join(', ') : 'No data'}
@@ -136,7 +236,8 @@ export default function ReportHub() {
                         {latestSymptom?.general?.contraceptiveUse === 'none' ? 'None (Non-hormonal)' : 
                          latestSymptom?.general?.contraceptiveUse === 'pill' ? 'Oral Contraceptives' :
                          latestSymptom?.general?.contraceptiveUse === 'iud' ? 'Hormonal IUD' : 
-                         latestSymptom?.general?.contraceptiveUse === 'implant' ? 'Hormonal Implant/Injection' : 'Not recorded'}
+                         latestSymptom?.general?.contraceptiveUse === 'implant' ? 'Hormonal Implant/Injection' : 
+                         latestSymptom?.general?.contraceptiveUse === 'hrt' ? 'Hormone Replacement Therapy (HRT)' : 'Not recorded'}
                       </td>
                     </tr>
                     <tr>
@@ -147,9 +248,27 @@ export default function ReportHub() {
                       <td><strong>Family Autoimmune History:</strong></td>
                       <td>{latestSymptom?.general?.familyAutoimmune === 'yes' ? 'Positive (Increased risk of systemic flares)' : 'None reported / Unknown'}</td>
                     </tr>
+                    <tr>
+                      <td><strong>History of Clinical Dismissal:</strong></td>
+                      <td>
+                        {latestSymptom?.general?.dismissalHistory === 'no' ? 'No dismissal reported' : 
+                         latestSymptom?.general?.dismissalHistory === 'yes-once' ? 'Yes, at least once (told symptoms are just stress/anxiety)' :
+                         latestSymptom?.general?.dismissalHistory === 'yes-multiple' ? 'Yes, multiple times by different providers' : 'Not recorded'}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Pregnancy & Vascular History:</strong></td>
+                      <td>
+                        {latestSymptom?.general?.pregnancyComplications === 'preeclampsia' ? 'Positive (History of Preeclampsia/Gestational Hypertension)' : 
+                         latestSymptom?.general?.pregnancyComplications === 'diabetes' ? 'Positive (History of Gestational Diabetes)' :
+                         latestSymptom?.general?.pregnancyComplications === 'none' ? 'No pregnancy complications reported' : 'Not Applicable / Not recorded'}
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
+
+              {renderDetailedCharacteristics(latestSymptom)}
 
               <div className="report-section">
                 <h3 className="report-sec-title"><ClipboardList size={16} className="inline mr-1" /> VOCABULARY MAPPING & NOTES</h3>
@@ -243,7 +362,11 @@ export default function ReportHub() {
                         irregularBleeding: 'Irregular Bleeding',
                         jointPain: 'Joint/Muscle Pain',
                         bloating: 'Bloating',
-                        brainFog: 'Cognitive Dysfunction'
+                        brainFog: 'Cognitive Dysfunction',
+                        digestiveIssues: 'Gastrointestinal & Bowel Issues',
+                        dizziness: 'Orthostatic Dizziness / Fainting',
+                        coldSensitivity: 'Thyroid & Temperature Markers',
+                        moodFluctuations: 'Cycle-Linked Mood Shifts'
                       };
                       return nameMap[s] || s;
                     }).join(', ') : 'No data'}
@@ -255,7 +378,8 @@ export default function ReportHub() {
                     {latestSymptom?.general?.contraceptiveUse === 'none' ? 'None (Non-hormonal)' : 
                      latestSymptom?.general?.contraceptiveUse === 'pill' ? 'Oral Contraceptives' :
                      latestSymptom?.general?.contraceptiveUse === 'iud' ? 'Hormonal IUD' : 
-                     latestSymptom?.general?.contraceptiveUse === 'implant' ? 'Hormonal Implant/Injection' : 'Not recorded'}
+                     latestSymptom?.general?.contraceptiveUse === 'implant' ? 'Hormonal Implant/Injection' : 
+                     latestSymptom?.general?.contraceptiveUse === 'hrt' ? 'Hormone Replacement Therapy (HRT)' : 'Not recorded'}
                   </td>
                 </tr>
                 <tr>
@@ -266,9 +390,27 @@ export default function ReportHub() {
                   <td><strong>Family Autoimmune History:</strong></td>
                   <td>{latestSymptom?.general?.familyAutoimmune === 'yes' ? 'Positive (Increased risk of systemic flares)' : 'None reported / Unknown'}</td>
                 </tr>
+                <tr>
+                  <td><strong>History of Clinical Dismissal:</strong></td>
+                  <td>
+                    {latestSymptom?.general?.dismissalHistory === 'no' ? 'No dismissal reported' : 
+                     latestSymptom?.general?.dismissalHistory === 'yes-once' ? 'Yes, at least once (told symptoms are just stress/anxiety)' :
+                     latestSymptom?.general?.dismissalHistory === 'yes-multiple' ? 'Yes, multiple times by different providers' : 'Not recorded'}
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Pregnancy & Vascular History:</strong></td>
+                  <td>
+                    {latestSymptom?.general?.pregnancyComplications === 'preeclampsia' ? 'Positive (History of Preeclampsia/Gestational Hypertension)' : 
+                     latestSymptom?.general?.pregnancyComplications === 'diabetes' ? 'Positive (History of Gestational Diabetes)' :
+                     latestSymptom?.general?.pregnancyComplications === 'none' ? 'No pregnancy complications reported' : 'Not Applicable / Not recorded'}
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
+
+          {renderDetailedCharacteristics(latestSymptom)}
 
           <div className="report-section">
             <h3 className="report-sec-title"><ClipboardList size={16} className="inline mr-1" /> VOCABULARY MAPPING & NOTES</h3>

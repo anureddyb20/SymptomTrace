@@ -15,6 +15,10 @@ export default function SmartCheck({ onSurveyCompleted }) {
     jointPain: false,
     bloating: false,
     brainFog: false,
+    digestiveIssues: false,
+    dizziness: false,
+    coldSensitivity: false,
+    moodFluctuations: false,
   });
 
   const [painDetails, setPainDetails] = useState({
@@ -43,10 +47,41 @@ export default function SmartCheck({ onSurveyCompleted }) {
     }
   });
 
+  const [bleedingDetails, setBleedingDetails] = useState({
+    regularity: 'regular', // regular, irregular, absent, unpredictable
+    volume: 'moderate', // light, moderate, heavy, spotting
+    clotSize: 'none', // none, small, large
+  });
+
+  const [digestiveDetails, setDigestiveDetails] = useState({
+    painBowel: false,
+    cycleLinkedIbs: false,
+    nausea: false,
+  });
+
+  const [dizzinessDetails, setDizzinessDetails] = useState({
+    standingUp: false,
+    heatIntolerance: false,
+    fainting: false,
+  });
+
+  const [temperatureDetails, setTemperatureDetails] = useState({
+    coldIntolerance: false,
+    heatIntolerance: false,
+    hairThinning: false,
+  });
+
+  const [moodDetails, setMoodDetails] = useState({
+    pmddSigns: false,
+    insomnia: false,
+  });
+
   const [generalFactors, setGeneralFactors] = useState({
     durationMonths: '1', // <1, 1-6, 6-12, 12+
     familyAutoimmune: 'no', // yes, no, unsure
     contraceptiveUse: 'none', // pill, iud, implant, none
+    dismissalHistory: 'no', // yes-multiple, yes-once, no, unsure
+    pregnancyComplications: 'none', // diabetes, preeclampsia, none, na
     notes: '',
   });
 
@@ -75,8 +110,17 @@ export default function SmartCheck({ onSurveyCompleted }) {
   };
 
   // Determine if conditional step is needed
-  // Conditional step is needed if pelvicPain, abdominalPain, fatigue, or palpitations are checked.
-  const hasConditionalSymptoms = symptoms.pelvicPain || symptoms.abdominalPain || symptoms.fatigue || symptoms.palpitations;
+  // Conditional step is needed if pelvicPain, abdominalPain, fatigue, palpitations, irregularBleeding, digestiveIssues, dizziness, coldSensitivity, or moodFluctuations are checked.
+  const hasConditionalSymptoms = 
+    symptoms.pelvicPain || 
+    symptoms.abdominalPain || 
+    symptoms.fatigue || 
+    symptoms.palpitations ||
+    symptoms.irregularBleeding ||
+    symptoms.digestiveIssues ||
+    symptoms.dizziness ||
+    symptoms.coldSensitivity ||
+    symptoms.moodFluctuations;
 
   const totalSteps = hasConditionalSymptoms ? 3 : 2;
 
@@ -107,6 +151,11 @@ export default function SmartCheck({ onSurveyCompleted }) {
         pain: (symptoms.pelvicPain || symptoms.abdominalPain) ? painDetails : null,
         fatigue: symptoms.fatigue ? fatigueDetails : null,
         palpitations: symptoms.palpitations ? palpDetails : null,
+        bleeding: symptoms.irregularBleeding ? bleedingDetails : null,
+        digestive: symptoms.digestiveIssues ? digestiveDetails : null,
+        dizziness: symptoms.dizziness ? dizzinessDetails : null,
+        temperature: symptoms.coldSensitivity ? temperatureDetails : null,
+        mood: symptoms.moodFluctuations ? moodDetails : null,
       },
       general: generalFactors,
     };
@@ -228,6 +277,42 @@ export default function SmartCheck({ onSurveyCompleted }) {
                 <div className="checkbox-indicator"></div>
                 <h4>Brain Fog & Memory Issues</h4>
                 <p>Difficulty concentrating, word-finding gaps, or severe cognitive fatigue.</p>
+              </div>
+
+              <div 
+                className={`symptom-select-card ${symptoms.digestiveIssues ? 'selected' : ''}`}
+                onClick={() => handleSymptomToggle('digestiveIssues')}
+              >
+                <div className="checkbox-indicator"></div>
+                <h4>Gastrointestinal & Bowel Issues</h4>
+                <p>Nausea, cycle-linked IBS, pain during bowel movements, or rectal bleeding.</p>
+              </div>
+
+              <div 
+                className={`symptom-select-card ${symptoms.dizziness ? 'selected' : ''}`}
+                onClick={() => handleSymptomToggle('dizziness')}
+              >
+                <div className="checkbox-indicator"></div>
+                <h4>Orthostatic Dizziness / Fainting</h4>
+                <p>Lightheadedness when standing up, syncope, or postural discomfort.</p>
+              </div>
+
+              <div 
+                className={`symptom-select-card ${symptoms.coldSensitivity ? 'selected' : ''}`}
+                onClick={() => handleSymptomToggle('coldSensitivity')}
+              >
+                <div className="checkbox-indicator"></div>
+                <h4>Thyroid & Temperature Markers</h4>
+                <p>Intolerant to cold or heat, hair thinning, or skin changes.</p>
+              </div>
+
+              <div 
+                className={`symptom-select-card ${symptoms.moodFluctuations ? 'selected' : ''}`}
+                onClick={() => handleSymptomToggle('moodFluctuations')}
+              >
+                <div className="checkbox-indicator"></div>
+                <h4>Cycle-Linked Mood Shifts</h4>
+                <p>Severe pre-period anxiety, depression, PMDD, or sleep disruptions.</p>
               </div>
             </div>
           </div>
@@ -456,6 +541,212 @@ export default function SmartCheck({ onSurveyCompleted }) {
                 </div>
               </div>
             )}
+
+            {/* Irregular / Heavy Bleeding Details */}
+            {symptoms.irregularBleeding && (
+              <div className="detail-section card inner-card mt-4">
+                <h3>Bleeding & Cycle Characteristics</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="input-label">Cycle Regularity:</label>
+                    <select 
+                      value={bleedingDetails.regularity}
+                      onChange={(e) => setBleedingDetails(prev => ({ ...prev, regularity: e.target.value }))}
+                      className="custom-select"
+                    >
+                      <option value="regular">Regular (occurs every 21-35 days)</option>
+                      <option value="irregular">Irregular (varies significantly in length)</option>
+                      <option value="unpredictable">Highly Unpredictable (frequent double periods or spotting)</option>
+                      <option value="absent">Absent / Amenorrhea (no cycle for 3+ months)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="input-label">Bleeding Volume & Flow:</label>
+                    <select 
+                      value={bleedingDetails.volume}
+                      onChange={(e) => setBleedingDetails(prev => ({ ...prev, volume: e.target.value }))}
+                      className="custom-select"
+                    >
+                      <option value="light">Light flow / Spotting only</option>
+                      <option value="moderate">Moderate flow</option>
+                      <option value="heavy">Heavy flow (requires changing pad/tampon every 1-2 hours)</option>
+                      <option value="clotting">Very heavy with visible coagulates/clots</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group col-span-2">
+                    <label className="input-label">Blood Clots Size (If Present):</label>
+                    <div className="radio-group">
+                      <button 
+                        type="button" 
+                        className={`quad-btn ${bleedingDetails.clotSize === 'none' ? 'active' : ''}`}
+                        onClick={() => setBleedingDetails(prev => ({ ...prev, clotSize: 'none' }))}
+                      >
+                        No clots
+                      </button>
+                      <button 
+                        type="button" 
+                        className={`quad-btn ${bleedingDetails.clotSize === 'small' ? 'active' : ''}`}
+                        onClick={() => setBleedingDetails(prev => ({ ...prev, clotSize: 'small' }))}
+                      >
+                        Small clots (dime-sized or smaller)
+                      </button>
+                      <button 
+                        type="button" 
+                        className={`quad-btn ${bleedingDetails.clotSize === 'large' ? 'active' : ''}`}
+                        onClick={() => setBleedingDetails(prev => ({ ...prev, clotSize: 'large' }))}
+                      >
+                        Large clots (quarter-sized or larger)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Digestive Issues Details */}
+            {symptoms.digestiveIssues && (
+              <div className="detail-section card inner-card mt-4">
+                <h3>Gastrointestinal & Bowel Details</h3>
+                <div className="form-group">
+                  <label className="input-label">Select Specific Gastrointestinal Manifestations:</label>
+                  <div className="symptom-check-list">
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={digestiveDetails.painBowel}
+                        onChange={() => setDigestiveDetails(prev => ({ ...prev, painBowel: !prev.painBowel }))}
+                      />
+                      <span><strong>Pain During Bowel Movements:</strong> Sharp pelvic pain or cramping specifically when passing stool (especially during period).</span>
+                    </label>
+
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={digestiveDetails.cycleLinkedIbs}
+                        onChange={() => setDigestiveDetails(prev => ({ ...prev, cycleLinkedIbs: !prev.cycleLinkedIbs }))}
+                      />
+                      <span><strong>Cycle-Linked IBS:</strong> Alternating diarrhea and constipation that fluctuates with your menstrual calendar.</span>
+                    </label>
+
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={digestiveDetails.nausea}
+                        onChange={() => setDigestiveDetails(prev => ({ ...prev, nausea: !prev.nausea }))}
+                      />
+                      <span><strong>Nausea & Reflux:</strong> Feeling nauseous, experiencing acid reflux, or loss of appetite during high-pain windows.</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Dizziness / Orthostatic Details */}
+            {symptoms.dizziness && (
+              <div className="detail-section card inner-card mt-4">
+                <h3>Orthostatic Dizziness & Autonomic Profiles</h3>
+                <div className="form-group">
+                  <label className="input-label">Identify Orthostatic Triggers:</label>
+                  <div className="symptom-check-list">
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={dizzinessDetails.standingUp}
+                        onChange={() => setDizzinessDetails(prev => ({ ...prev, standingUp: !prev.standingUp }))}
+                      />
+                      <span><strong>Standing Up:</strong> Dizziness, lightheadedness, or vision dimming when standing from a sitting/lying position.</span>
+                    </label>
+
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={dizzinessDetails.heatIntolerance}
+                        onChange={() => setDizzinessDetails(prev => ({ ...prev, heatIntolerance: !prev.heatIntolerance }))}
+                      />
+                      <span><strong>Heat / Shower Triggers:</strong> Getting dizzy or feeling faint in hot environments, showers, or baths.</span>
+                    </label>
+
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={dizzinessDetails.fainting}
+                        onChange={() => setDizzinessDetails(prev => ({ ...prev, fainting: !prev.fainting }))}
+                      />
+                      <span><strong>History of Syncope (Fainting):</strong> Have actually fainted, or come very close to blacking out, due to orthostatic stress.</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Thyroid & Temperature Details */}
+            {symptoms.coldSensitivity && (
+              <div className="detail-section card inner-card mt-4">
+                <h3>Endocrine & Temperature Regulation Profile</h3>
+                <div className="form-group">
+                  <label className="input-label">Check All Systemic Markers Experienced:</label>
+                  <div className="symptom-check-list">
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={temperatureDetails.coldIntolerance}
+                        onChange={() => setTemperatureDetails(prev => ({ ...prev, coldIntolerance: !prev.coldIntolerance }))}
+                      />
+                      <span><strong>Cold Intolerance:</strong> Feeling freezing cold (especially hands and feet) when others are comfortable.</span>
+                    </label>
+
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={temperatureDetails.heatIntolerance}
+                        onChange={() => setTemperatureDetails(prev => ({ ...prev, heatIntolerance: !prev.heatIntolerance }))}
+                      />
+                      <span><strong>Heat Intolerance:</strong> Inability to handle warm temperatures, excessive sweating, or flushing.</span>
+                    </label>
+
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={temperatureDetails.hairThinning}
+                        onChange={() => setTemperatureDetails(prev => ({ ...prev, hairThinning: !prev.hairThinning }))}
+                      />
+                      <span><strong>Hair & Skin Changes:</strong> Unexplained thinning of outer eyebrows/scalp hair, or extremely dry skin.</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mood & Sleep Details */}
+            {symptoms.moodFluctuations && (
+              <div className="detail-section card inner-card mt-4">
+                <h3>Neuro-Hormonal & Sleep Correlation</h3>
+                <div className="form-group">
+                  <label className="input-label">Select Cycle-Linked Brain/Sleep Patterns:</label>
+                  <div className="symptom-check-list">
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={moodDetails.pmddSigns}
+                        onChange={() => setMoodDetails(prev => ({ ...prev, pmddSigns: !prev.pmddSigns }))}
+                      />
+                      <span><strong>Severe Pre-Menstrual Dysphoria (PMDD):</strong> Extreme anxiety, crying spells, irritability, or depression starting 1-2 weeks before period and resolving within days of bleeding.</span>
+                    </label>
+
+                    <label className="check-option">
+                      <input 
+                        type="checkbox"
+                        checked={moodDetails.insomnia}
+                        onChange={() => setMoodDetails(prev => ({ ...prev, insomnia: !prev.insomnia }))}
+                      />
+                      <span><strong>Cycle-Linked Insomnia:</strong> Difficulty falling or staying asleep, or having night sweats specifically during the luteal phase.</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -510,6 +801,36 @@ export default function SmartCheck({ onSurveyCompleted }) {
                   <option value="hrt">Hormone Replacement Therapy (HRT)</option>
                 </select>
                 <p className="text-xs text-muted mt-1">Hormonal contraceptives can temporarily mask underlying conditions like Endometriosis or PCOS.</p>
+              </div>
+
+              <div className="form-group col-span-2">
+                <label className="input-label">Have your symptoms ever been dismissed by a healthcare provider?</label>
+                <select 
+                  value={generalFactors.dismissalHistory}
+                  onChange={(e) => setGeneralFactors(prev => ({ ...prev, dismissalHistory: e.target.value }))}
+                  className="custom-select"
+                >
+                  <option value="no">No, they have been taken seriously</option>
+                  <option value="yes-once">Yes, at least once (e.g. told it's just stress/anxiety)</option>
+                  <option value="yes-multiple">Yes, multiple times by different doctors</option>
+                  <option value="unsure">Unsure / Not sure if it was dismissal</option>
+                </select>
+                <p className="text-xs text-muted mt-1"><Info size={12} className="inline mr-1" /> Dismissal of chronic pain is common; reports show females wait average 5+ years longer for diagnosis.</p>
+              </div>
+
+              <div className="form-group col-span-2">
+                <label className="input-label">Biological Pregnancy & Reproductive History:</label>
+                <select 
+                  value={generalFactors.pregnancyComplications}
+                  onChange={(e) => setGeneralFactors(prev => ({ ...prev, pregnancyComplications: e.target.value }))}
+                  className="custom-select"
+                >
+                  <option value="none">None / No history of complications</option>
+                  <option value="preeclampsia">History of Preeclampsia or Gestational Hypertension</option>
+                  <option value="diabetes">History of Gestational Diabetes</option>
+                  <option value="na">Not Applicable</option>
+                </select>
+                <p className="text-xs text-muted mt-1">Pregnancy vascular/metabolic complications are critical long-term markers for cardiovascular health in women.</p>
               </div>
 
               <div className="form-group col-span-2">
