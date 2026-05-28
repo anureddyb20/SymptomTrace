@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import { 
+  Home,
   Shield, 
   Activity, 
   BrainCircuit, 
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 
 // Component imports
+import Dashboard from './components/Dashboard';
 import PrivacyCenter from './components/PrivacyCenter';
 import SmartCheck from './components/SmartCheck';
 import DiagnosticPreview from './components/DiagnosticPreview';
@@ -33,10 +35,11 @@ export default function App() {
   const handleSurveyCompleted = () => {
     triggerDataRefresh();
     // Redirect to Diagnostic Preview automatically
-    setActiveTab(2);
+    setActiveTab(3);
   };
 
   const menuItems = [
+    { name: 'Dashboard', icon: Home, component: Dashboard },
     { name: 'Privacy Center', icon: Shield, component: PrivacyCenter },
     { name: 'Smart Check', icon: Activity, component: SmartCheck },
     { name: 'Diagnostic Preview', icon: BrainCircuit, component: DiagnosticPreview },
@@ -91,7 +94,7 @@ export default function App() {
           const Icon = item.icon;
           // Shorter names for mobile navigation tags
           const mobileNames = [
-            'Privacy', 'Check', 'Preview', 'Cycle', 'Trends', 'Report', 'Advocate', 'Decode'
+            'Home', 'Privacy', 'Check', 'Preview', 'Cycle', 'Trends', 'Report', 'Advocate', 'Decode'
           ];
           return (
             <button
@@ -113,6 +116,7 @@ export default function App() {
           activeTab={activeTab}
           onSurveyCompleted={handleSurveyCompleted}
           onDataChanged={triggerDataRefresh}
+          setActiveTab={setActiveTab}
         />
       </main>
     </div>
