@@ -1,0 +1,28 @@
+{
+  "short_name": "SymptomMatch",
+  "name": "Symptom-Match: The Female Diagnostic Engine",
+  "description": "A local-first Clinical Decision Support System and patient advocacy tool designed specifically to bridge the gender health gap.",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#FAF7F2",
+  "theme_color": "#4A2E56",
+  "display": "standalone",
+  "orientation": "portrait"
+}
